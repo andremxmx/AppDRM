@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="#80000000"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/player_button_background"
+        android:src="@android:drawable/ic_menu_revert"
+        android:contentDescription="@string/back_button" />
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+    <ImageButton
+        android:id="@id/exo_rew"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/player_button_background"
+        android:src="@drawable/exo_icon_rewind"
+        android:contentDescription="@string/rewind" />
+
+    <FrameLayout
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="16dp">
+
+        <ImageButton
+            android:id="@id/exo_play"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/player_button_background"
+            android:src="@drawable/ic_play"
+            android:contentDescription="@string/play_pause" />
+
+        <ImageButton
+            android:id="@id/exo_pause"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/player_button_background"
+            android:src="@drawable/ic_pause"
+            android:contentDescription="@string/play_pause" />
+
+    </FrameLayout>
+
+    <ImageButton
+        android:id="@id/exo_ffwd"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/player_button_background"
+        android:src="@drawable/exo_icon_fastforward"
+        android:contentDescription="@string/forward" />
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+</LinearLayout>

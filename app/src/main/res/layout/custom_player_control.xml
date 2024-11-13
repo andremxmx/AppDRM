@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/controls_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/controls_background"
+        android:orientation="horizontal"
+        android:padding="24dp"
+        android:clipToPadding="false"
+        android:clipChildren="false">
+
+        <Button
+            android:id="@+id/btn_channels"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Channels"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:focusable="true"
+            android:nextFocusRight="@id/btn_play_pause"
+            android:background="@drawable/button_selector"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_marginHorizontal="8dp"/>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/btn_play_pause"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:padding="12dp"
+            android:background="@drawable/circle_button_selector"
+            android:src="@drawable/ic_play"
+            android:nextFocusLeft="@id/btn_channels"
+            android:nextFocusRight="@id/btn_back"
+            android:focusable="true"
+            android:layout_marginHorizontal="8dp"/>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Home"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:focusable="true"
+            android:nextFocusLeft="@id/btn_play_pause"
+            android:background="@drawable/button_selector"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_marginHorizontal="8dp"/>
+
+    </LinearLayout>
+
+</FrameLayout>

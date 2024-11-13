@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Channel list dimensions -->
+    <dimen name="channel_item_spacing">8dp</dimen>
+    <dimen name="channel_item_padding">12dp</dimen>
+    <dimen name="channel_item_height">80dp</dimen>
+    
+    <!-- Channel logo dimensions -->
+    <dimen name="channel_logo_width">60dp</dimen>
+    <dimen name="channel_logo_height">60dp</dimen>
+    
+    <!-- Text sizes -->
+    <dimen name="channel_name_text_size">16sp</dimen>
+    
+    <!-- Focus effect -->
+    <dimen name="focus_scale">1.1</dimen>
+    <dimen name="unfocus_scale">1.0</dimen>
+</resources>
