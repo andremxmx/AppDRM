@@ -15,7 +15,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var playerView: PlayerView
     private lateinit var loadingIndicator: ProgressBar
     private var videoUrl: String = ""
-    private var currentPosition: Long = 0
+    private var lastPosition: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +36,8 @@ class PlayerActivity : AppCompatActivity() {
             return
         }
 
-        // Recuperar la última posición guardada
-        currentPosition = VideoProgress.getProgress(this, videoUrl)
+        // Retrieve last position from VideoProgress
+        lastPosition = VideoProgress.getProgress(this, videoUrl)
         
         setupPlayer()
     }
@@ -53,12 +53,13 @@ class PlayerActivity : AppCompatActivity() {
                         Player.STATE_BUFFERING -> loadingIndicator.visibility = android.view.View.VISIBLE
                         Player.STATE_READY -> {
                             loadingIndicator.visibility = android.view.View.GONE
-                            // Solo restauramos la posición la primera vez
-                            if (currentPosition > 0 && player.currentPosition == 0L) {
-                                seekTo(currentPosition)
+                            // Restore position if it exists and we haven't seeked yet
+                            if (lastPosition > 0 && currentPosition == 0L) {
+                                seekTo(lastPosition)
                             }
                         }
                         Player.STATE_ENDED -> {
+                            // Clear progress when video ends naturally
                             VideoProgress.clearProgress(this@PlayerActivity, videoUrl)
                             finish()
                         }
@@ -70,9 +71,8 @@ class PlayerActivity : AppCompatActivity() {
                     newPosition: Player.PositionInfo,
                     reason: Int
                 ) {
-                    // Guardamos la posición cuando el usuario hace seek manualmente
+                    // Save position when user manually seeks
                     if (reason == Player.DISCONTINUITY_REASON_SEEK) {
-                        currentPosition = player.currentPosition
                         VideoProgress.saveProgress(this@PlayerActivity, videoUrl, currentPosition)
                     }
                 }
@@ -85,9 +85,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (player.isPlaying) {
-            player.playWhenReady = false
-        }
+        player.playWhenReady = false
         saveCurrentProgress()
     }
 
@@ -103,11 +101,8 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun saveCurrentProgress() {
-        if (::player.isInitialized && 
-            player.playbackState != Player.STATE_ENDED && 
-            player.currentPosition > 0) {
-            currentPosition = player.currentPosition
-            VideoProgress.saveProgress(this, videoUrl, currentPosition)
+        if (player.playbackState != Player.STATE_ENDED && player.currentPosition > 0) {
+            VideoProgress.saveProgress(this, videoUrl, player.currentPosition)
         }
     }
 }

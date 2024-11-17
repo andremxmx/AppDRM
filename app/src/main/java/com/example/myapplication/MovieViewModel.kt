@@ -15,6 +15,8 @@ import com.google.gson.reflect.TypeToken
 import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 class MovieViewModel : ViewModel() {
     private val _movies = MutableLiveData<List<TMDBMovie>>()
@@ -23,8 +25,10 @@ class MovieViewModel : ViewModel() {
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
 
+    private val okHttpClient = MovieApiService.createOkHttpClient()
     private val retrofit = Retrofit.Builder()
         .baseUrl(MovieApiService.BASE_URL)
+        .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
@@ -33,9 +37,19 @@ class MovieViewModel : ViewModel() {
     private suspend fun fetchMoviesFromJson(): List<LocalMovie> {
         return withContext(Dispatchers.IO) {
             try {
-                val jsonString = URL("https://dslive.site/json/movies.json").readText()
-                val movieListType = object : TypeToken<List<LocalMovie>>() {}.type
-                Gson().fromJson(jsonString, movieListType)
+                val request = Request.Builder()
+                    .url("https://dslive.site/json/movies.json")
+                    .build()
+                
+                val response = okHttpClient.newCall(request).execute()
+                val jsonString = response.body?.string() ?: ""
+                
+                if (jsonString.isNotEmpty()) {
+                    val movieListType = object : TypeToken<List<LocalMovie>>() {}.type
+                    Gson().fromJson(jsonString, movieListType)
+                } else {
+                    emptyList()
+                }
             } catch (e: Exception) {
                 println("Error fetching JSON: ${e.message}")
                 emptyList()
