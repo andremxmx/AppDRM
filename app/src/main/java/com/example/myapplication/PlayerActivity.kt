@@ -9,6 +9,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.C
 
 class PlayerActivity : AppCompatActivity() {
     private lateinit var player: ExoPlayer
@@ -43,9 +44,26 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun setupPlayer() {
+        val drmKey = intent.getStringExtra("drmKey")
+        
         player = ExoPlayer.Builder(this).build().apply {
             playerView.player = this
-            setMediaItem(MediaItem.fromUri(videoUrl))
+            
+            if (drmKey != null) {
+                val mediaItem = MediaItem.Builder()
+                    .setUri(videoUrl)
+                    .setDrmConfiguration(
+                        MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+                            .setLicenseUri(intent.getStringExtra("licenseUrl"))
+                            .setMultiSession(true)
+                            .setKeySetId(drmKey.toByteArray())
+                            .build()
+                    )
+                    .build()
+                setMediaItem(mediaItem)
+            } else {
+                setMediaItem(MediaItem.fromUri(videoUrl))
+            }
             
             addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(state: Int) {

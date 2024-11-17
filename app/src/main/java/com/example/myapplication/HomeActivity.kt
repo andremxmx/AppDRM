@@ -45,6 +45,7 @@ class HomeActivity : AppCompatActivity() {
                 0 -> startActivity(Intent(this, MainActivity::class.java))
                 // Comment out until activities are implemented
                 1 -> startActivity(Intent(this, MoviesActivity::class.java))
+                2 -> startActivity(Intent(this, VodActivity::class.java))
                 /*2 -> startActivity(Intent(this, SeriesActivity::class.java))
                 3 -> startActivity(Intent(this, MusicActivity::class.java))*/
             }
@@ -53,7 +54,8 @@ class HomeActivity : AppCompatActivity() {
 
     private fun getMenuItems(): List<MenuItem> = listOf(
         MenuItem("TV en vivo", android.R.drawable.ic_media_play),
-        MenuItem("Películas", android.R.drawable.ic_menu_gallery)  // Using a default Android icon
+        MenuItem("Películas", android.R.drawable.ic_menu_gallery),
+        MenuItem("Películas 2", android.R.drawable.ic_menu_slideshow)
         /*MenuItem("Series", R.drawable.ic_series),
         MenuItem("Música", R.drawable.ic_music)*/
     )
@@ -86,6 +88,7 @@ class HomeActivity : AppCompatActivity() {
                     0 -> startActivity(Intent(this@HomeActivity, MainActivity::class.java))
                     // Comment out until activities are implemented
                     1 -> startActivity(Intent(this@HomeActivity, MoviesActivity::class.java))
+                    2 -> startActivity(Intent(this@HomeActivity, VodActivity::class.java))
                     /*2 -> startActivity(Intent(this@HomeActivity, SeriesActivity::class.java))
                     3 -> startActivity(Intent(this@HomeActivity, MusicActivity::class.java))*/
                 }
