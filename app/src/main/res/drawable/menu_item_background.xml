@@ -2,17 +2,20 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_focused="true">
         <shape>
-            <solid android:color="#3F51B5" />
-            <corners android:radius="8dp" />
+            <gradient
+                android:startColor="@color/menu_gradient_start"
+                android:endColor="@color/menu_gradient_end"
+                android:angle="135"/>
+            <corners android:radius="16dp"/>
+            <stroke
+                android:width="2dp"
+                android:color="@color/menu_item_stroke"/>
         </shape>
     </item>
     <item>
         <shape>
-            <gradient
-                android:angle="45"
-                android:startColor="#FF4B4B"
-                android:endColor="#FF6B6B"
-                android:type="linear" />
+            <solid android:color="@color/menu_item_unfocused"/>
+            <corners android:radius="16dp"/>
         </shape>
     </item>
 </selector>

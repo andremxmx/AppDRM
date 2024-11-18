@@ -23,6 +23,24 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer
 import com.google.android.exoplayer2.mediacodec.MediaCodecSelector
 import com.google.android.exoplayer2.DefaultRenderersFactory
+import com.google.android.exoplayer2.upstream.DefaultDataSource
+import com.google.android.exoplayer2.upstream.DataSource
+
+// Add these imports
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.drm.DefaultDrmSessionManager
+import com.google.android.exoplayer2.drm.FrameworkMediaDrm
+import com.google.android.exoplayer2.drm.LocalMediaDrmCallback
+import com.google.android.exoplayer2.source.MediaSource
+import android.net.Uri
+import java.security.cert.X509Certificate
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
+import okhttp3.OkHttpClient
+import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy
+import com.google.android.exoplayer2.upstream.HttpDataSource
+import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy
 
 class VideoPlayerActivity : AppCompatActivity() {
     private var player: ExoPlayer? = null
@@ -73,81 +91,91 @@ class VideoPlayerActivity : AppCompatActivity() {
     private fun setupPlayer(videoUrl: String) {
         try {
             val dataSourceFactory = DefaultHttpDataSource.Factory()
-                .setUserAgent("MyApplication/1.0")
-                .setConnectTimeoutMs(30000) // Increased timeout
-                .setReadTimeoutMs(30000)
+                .setUserAgent("ExoPlayer")
+                .setConnectTimeoutMs(15000)
+                .setReadTimeoutMs(15000)
                 .setAllowCrossProtocolRedirects(true)
+                .setDefaultRequestProperties(mapOf(
+                    "Accept" to "*/*",
+                    "Accept-Encoding" to "gzip, deflate",
+                    "Connection" to "keep-alive"
+                ))
 
-            val loadControl: LoadControl = DefaultLoadControl.Builder()
-                .setBufferDurationsMs(
-                    32 * 1024, // Increased minimum buffer
-                    64 * 1024, // Increased maximum buffer
-                    2500, // Buffer for playback
-                    5000 // Buffer for playback after rebuffer
-                )
-                .setPrioritizeTimeOverSizeThresholds(true)
-                .build()
-
-            val renderersFactory = DefaultRenderersFactory(this)
-                .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER)
-                .setEnableDecoderFallback(true)
+            val defaultDataSourceFactory = DefaultDataSource.Factory(this, dataSourceFactory)
 
             val mediaItem = MediaItem.Builder()
                 .setUri(videoUrl)
                 .setMimeType(when {
-                    videoUrl.endsWith(".mp4") -> "video/mp4"
-                    videoUrl.endsWith(".mkv") -> "video/x-matroska"
-                    videoUrl.endsWith(".m3u8") -> "application/x-mpegURL"
                     videoUrl.endsWith(".mpd") -> "application/dash+xml"
-                    else -> null
+                    videoUrl.contains(".m3u8") -> "application/x-mpegURL"
+                    else -> "video/mp4"
                 })
                 .build()
 
-            val mediaSourceFactory = when {
-                videoUrl.contains(".m3u8") -> HlsMediaSource.Factory(dataSourceFactory)
-                videoUrl.contains(".mpd") -> DashMediaSource.Factory(dataSourceFactory)
-                else -> ProgressiveMediaSource.Factory(dataSourceFactory)
+            val errorHandlingPolicy = object : DefaultLoadErrorHandlingPolicy() {
+                override fun getRetryDelayMsFor(
+                    loadErrorInfo: LoadErrorHandlingPolicy.LoadErrorInfo
+                ): Long {
+                    // Retry for HTTP errors
+                    return if (loadErrorInfo.exception is HttpDataSource.HttpDataSourceException) {
+                        // Retry after 3 seconds
+                        3000
+                    } else {
+                        C.TIME_UNSET
+                    }
+                }
+
+                override fun getMinimumLoadableRetryCount(dataType: Int): Int {
+                    return 3 // Number of retry attempts
+                }
             }
 
+            val mediaSourceFactory = DefaultMediaSourceFactory(defaultDataSourceFactory)
+                .setLoadErrorHandlingPolicy(errorHandlingPolicy)
+
             player = ExoPlayer.Builder(this)
-                .setRenderersFactory(renderersFactory)
-                .setLoadControl(loadControl)
-                .setMediaSourceFactory(DefaultMediaSourceFactory(dataSourceFactory))
+                .setMediaSourceFactory(mediaSourceFactory)
                 .build()
                 .also { exoPlayer ->
                     playerView.player = exoPlayer
-                    exoPlayer.addListener(object : Player.Listener {
-                        override fun onPlayerError(error: PlaybackException) {
-                            Toast.makeText(this@VideoPlayerActivity,
-                                "Error playing video: ${error.message}",
-                                Toast.LENGTH_LONG).show()
-                        }
-                        
-                        override fun onPlaybackStateChanged(state: Int) {
-                            when (state) {
-                                Player.STATE_IDLE -> {
-                                    // Handle idle state
-                                }
-                                Player.STATE_BUFFERING -> {
-                                    // Handle buffering state
-                                }
-                                Player.STATE_READY -> {
-                                    // Video is ready to play
-                                }
-                                Player.STATE_ENDED -> {
-                                    finish()
-                                }
-                            }
-                        }
-                    })
-                    exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(mediaItem))
+                    exoPlayer.setMediaItem(mediaItem)
                     exoPlayer.prepare()
                     exoPlayer.playWhenReady = true
                 }
+
         } catch (e: Exception) {
             Toast.makeText(this, "Error setting up player: ${e.message}", Toast.LENGTH_SHORT).show()
             finish()
         }
+    }
+
+    private fun createDashDrmMediaSource(
+        videoUrl: String,
+        dataSourceFactory: DefaultDataSource.Factory,
+        drmKey: String
+    ): MediaSource {
+        val (k, kid) = drmKey.split(":")
+        val licenseJson = """
+            {
+                "keys": [{
+                    "kty": "oct",
+                    "kid": "$kid",
+                    "k": "$k"
+                }],
+                "type": "temporary"
+            }
+        """.trimIndent().toByteArray()
+
+        val drmCallback = LocalMediaDrmCallback(licenseJson)
+        val drmSessionManager = DefaultDrmSessionManager.Builder()
+            .setUuidAndExoMediaDrmProvider(C.CLEARKEY_UUID) { uuid ->
+                FrameworkMediaDrm.newInstance(uuid)
+            }
+            .build(drmCallback)
+
+        return DashMediaSource.Factory(dataSourceFactory)
+            .setDrmSessionManagerProvider { drmSessionManager }
+            .createMediaSource(MediaItem.fromUri(videoUrl))
     }
 
     override fun onDestroy() {

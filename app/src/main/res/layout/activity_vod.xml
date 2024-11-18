@@ -1,57 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@android:color/black">
 
-    <!-- Detail Section -->
-    <FrameLayout
-        android:id="@+id/detail_section"
+    <!-- Background Image covering full screen -->
+    <ImageView
+        android:id="@+id/detail_image"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.7">
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:transitionName="poster_transition"/>
 
-        <ImageView
-            android:id="@+id/detail_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"/>
+    <!-- Overlay gradient on entire screen -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_background"/>
 
-        <!-- Text container with alpha background -->
-        <LinearLayout
+    <!-- Content Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Top Bar with Search -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:background="#B0000000">
+            android:padding="16dp">
 
-            <TextView
-                android:id="@+id/detail_title"
-                android:layout_width="match_parent"
+            <!-- Details text section with semi-transparent background -->
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="32sp"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"/>
+                android:orientation="vertical"
+                android:background="@drawable/rounded_background"
+                android:padding="16dp"
+                android:layout_marginEnd="360dp">
 
-            <TextView
-                android:id="@+id/detail_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textSize="16sp"
-                android:textColor="@android:color/white"/>
-        </LinearLayout>
-    </FrameLayout>
+                <TextView
+                    android:id="@+id/detail_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="32sp"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/vod_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.3"
-        android:padding="8dp"
-        android:clipToPadding="false"/>
+                <TextView
+                    android:id="@+id/detail_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"/>
+            </LinearLayout>
 
-</LinearLayout>
+            <!-- Search Container -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true">
+
+                <!-- Search Icon Button -->
+                <ImageButton
+                    android:id="@+id/search_button"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_search"
+                    android:background="@drawable/search_button_state"
+                    android:padding="12dp"
+                    android:tint="@color/search_icon_color"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:nextFocusDown="@id/vod_recycler"/>
+
+                <!-- Search Box (initially invisible) -->
+                <EditText
+                    android:id="@+id/search_box"
+                    android:layout_width="300dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/rounded_search_background"
+                    android:hint="Buscar películas..."
+                    android:textColorHint="#80FFFFFF"
+                    android:textColor="@android:color/white"
+                    android:paddingStart="48dp"
+                    android:paddingEnd="16dp"
+                    android:singleLine="true"
+                    android:imeOptions="actionSearch"
+                    android:visibility="gone"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:nextFocusDown="@id/vod_recycler"/>
+            </FrameLayout>
+        </RelativeLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <!-- Single row RecyclerView at bottom -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/vod_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:clipToPadding="false"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:paddingBottom="24dp"
+            android:nextFocusUp="@id/search_button"
+            android:paddingTop="16dp"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+</FrameLayout>

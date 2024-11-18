@@ -8,8 +8,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.myapplication.R
 import com.example.myapplication.models.VodItem
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 
 class VodAdapter(
     private val onItemClick: (VodItem) -> Unit
@@ -24,6 +27,7 @@ class VodAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VodViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_vod, parent, false)
+        view.nextFocusUpId = R.id.search_button
         return VodViewHolder(view)
     }
 
@@ -34,12 +38,13 @@ class VodAdapter(
         
         holder.itemView.setOnFocusChangeListener { v, hasFocus ->
             v.animate()
-                .scaleX(if (hasFocus) 1.15f else 1.0f)
-                .scaleY(if (hasFocus) 1.15f else 1.0f)
-                .setDuration(150)
-                .setInterpolator(android.view.animation.OvershootInterpolator())
+                .scaleX(if (hasFocus) 1.1f else 1.0f)
+                .scaleY(if (hasFocus) 1.1f else 1.0f)
+                .translationZ(if (hasFocus) 16f else 0f)
+                .translationY(if (hasFocus) -20f else 0f)
+                .setDuration(200)
+                .setInterpolator(FastOutSlowInInterpolator())
                 .start()
-            v.elevation = if (hasFocus) 12f else 4f
             
             if (hasFocus) {
                 onFocusChangeListener?.invoke(vod)
@@ -52,8 +57,10 @@ class VodAdapter(
 
         fun bind(vod: VodItem) {
             Glide.with(itemView.context)
-                .load(vod.imgv) // Using imgv for card image
-                .centerCrop()
+                .load(vod.imgv)
+                .transition(DrawableTransitionOptions.withCrossFade(300))
+                .thumbnail(0.1f)
+                .transform(RoundedCorners(8))
                 .into(imageView)
         }
     }

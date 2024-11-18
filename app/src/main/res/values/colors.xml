@@ -16,4 +16,15 @@
     <color name="button_text_normal">#CCFFFFFF</color>
     <color name="card_background">#1F1F1F</color>
     <color name="rating_color">#FFC107</color>
+    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimaryDark">#1976D2</color>
+    <color name="colorAccent">#FFFFFF</color>
+    <color name="editTextBackground">#3D3D3D</color>
+    <color name="menu_item_focused">#3F51B5</color>
+    <color name="menu_item_unfocused">#1F1F1F</color>
+    <color name="menu_item_stroke">#4CAF50</color>
+    <color name="menu_gradient_start">#2196F3</color>
+    <color name="menu_gradient_end">#673AB7</color>
+    <color name="menu_title_focused">#FFFFFF</color>
+    <color name="menu_title_unfocused">#CCCCCC</color>
 </resources>

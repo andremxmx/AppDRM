@@ -1,4 +1,3 @@
-
 package com.example.myapplication.viewmodels
 
 import androidx.lifecycle.*
@@ -17,6 +16,8 @@ class VodViewModel : ViewModel() {
     private val _selectedVod = MutableLiveData<VodItem>()
     val selectedVod: LiveData<VodItem> = _selectedVod
 
+    private var allVods = listOf<VodItem>()
+
     fun loadVods() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -28,11 +29,24 @@ class VodViewModel : ViewModel() {
                 client.newCall(request).execute().use { response ->
                     val json = response.body?.string()
                     val vodResponse = Gson().fromJson(json, VodResponse::class.java)
-                    _vods.postValue(vodResponse.data)
+                    allVods = vodResponse.data
+                    _vods.postValue(allVods)
                 }
             } catch (e: Exception) {
                 // Handle error
             }
+        }
+    }
+
+    fun filterVods(query: String) {
+        if (query.isEmpty()) {
+            _vods.value = allVods
+            return
+        }
+
+        _vods.value = allVods.filter { vod ->
+            vod.titulo.contains(query, ignoreCase = true) ||
+            vod.descripcion.contains(query, ignoreCase = true)
         }
     }
 

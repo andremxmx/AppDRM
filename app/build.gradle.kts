@@ -76,19 +76,19 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     // Core ExoPlayer library
-    implementation("com.google.android.exoplayer:exoplayer:2.18.0")
+    implementation("com.google.android.exoplayer:exoplayer-core:2.19.1")
 
     // ExoPlayer DASH support
-    implementation("com.google.android.exoplayer:exoplayer-dash:2.18.0")
+    implementation("com.google.android.exoplayer:exoplayer-dash:2.19.1")
 
     // ExoPlayer HLS support (si también necesitas HLS)
-    implementation("com.google.android.exoplayer:exoplayer-hls:2.18.0")
+    implementation("com.google.android.exoplayer:exoplayer-hls:2.19.1")
 
     // ExoPlayer SmoothStreaming support (si necesitas SmoothStreaming)
     implementation("com.google.android.exoplayer:exoplayer-smoothstreaming:2.18.0")
 
     // ExoPlayer UI module (para PlayerView y controles de UI)
-    implementation("com.google.android.exoplayer:exoplayer-ui:2.18.0")
+    implementation("com.google.android.exoplayer:exoplayer-ui:2.19.1")
 
     implementation("androidx.appcompat:appcompat:1.6.1") // Asegúrate de que esté presente
     implementation("androidx.core:core-ktx:1.10.1")
@@ -129,6 +129,9 @@ dependencies {
     //
     implementation("org.videolan.android:libvlc-all:3.5.1")
      implementation("com.android.volley:volley:1.2.1")
+
+        implementation("com.github.bumptech.glide:glide:4.12.0")
+        implementation("androidx.interpolator:interpolator:1.0.0")
 }
 
 tasks.withType<Test> {

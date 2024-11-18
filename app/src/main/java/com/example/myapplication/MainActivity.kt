@@ -12,8 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.slidingpanelayout.widget.SlidingPaneLayout
-import androidx.slidingpanelayout.widget.SlidingPaneLayout.PanelSlideListener
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.drm.*
@@ -26,15 +24,11 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.URL
 import android.graphics.Color
-import android.graphics.Rect
 import android.widget.Button
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.mediacodec.MediaCodecRenderer
-import com.google.android.exoplayer2.mediacodec.MediaCodecUtil
-import com.google.android.exoplayer2.source.MediaSourceFactory
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import android.util.Log
 import com.google.android.exoplayer2.source.MediaSource
@@ -45,7 +39,7 @@ import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
 import org.videolan.libvlc.util.VLCVideoLayout
 import android.net.Uri
-//import com.google.android.exoplayer2.ui.R as ExoPlayerR  // Añadir este import al inicio
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity(), Player.Listener {
 
@@ -204,7 +198,9 @@ class MainActivity : AppCompatActivity(), Player.Listener {
     private fun loadChannels() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val response = URL("https://dslive.site/json/channels.json").readText()
+                // Cambiar la URL a una completa con protocolo
+                val url = "https://dslive.site/json/channels.json"
+                val response = URL(url).readText()
                 val jsonObject = JSONObject(response)
                 val channelsList = mutableListOf<Channel>()
 
@@ -214,7 +210,7 @@ class MainActivity : AppCompatActivity(), Player.Listener {
                         name = channelObj.getString("name"),
                         logo = channelObj.getString("logo"),
                         playbackUrl = channelObj.getString("playbackUrl"),
-                        key = channelObj.getString("key")
+                        key = channelObj.optString("key", "")  // Hacer key opcional
                     ))
                 }
 
@@ -228,6 +224,14 @@ class MainActivity : AppCompatActivity(), Player.Listener {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    // Mostrar error al usuario
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Error cargando canales: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
     }
@@ -541,7 +545,6 @@ class MainActivity : AppCompatActivity(), Player.Listener {
                         true
                     }
                     event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                        // Cerrar la lista al navegar hacia la derecha
                         (v.context as? MainActivity)?.hideChannelList()
                         true
                     }
@@ -550,7 +553,6 @@ class MainActivity : AppCompatActivity(), Player.Listener {
             }
 
             holder.itemView.setOnFocusChangeListener { v, hasFocus ->
-                // Animación de escala
                 val scale = if (hasFocus) 1.05f else 1.0f
                 val alpha = if (hasFocus) 1f else 0.8f
 
@@ -561,12 +563,10 @@ class MainActivity : AppCompatActivity(), Player.Listener {
                     .setDuration(200)
                     .start()
 
-                // Cambiar color del texto
                 holder.name.setTextColor(
                     if (hasFocus) Color.WHITE else Color.parseColor("#CCCCCC")
                 )
 
-                // Efecto de elevación
                 v.elevation = if (hasFocus) 8f else 0f
             }
         }
